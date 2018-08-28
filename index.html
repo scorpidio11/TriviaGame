@@ -20,8 +20,38 @@
         body {
             background-image: url("assets/images/bg.jpg");
         }
+
+        .question {
+            font-family: 'Anton', sans-serif;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        .answers {
+            font-size: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+            color: grey;
+        }
+
+        input[type="radio"] {
+            margin-right: 5px;
+            margin-left: 15px;
+        }
+
+        #results {
+            padding-bottom: 30px;
+            font-size: 20px;
+
+        }
+        #results > h3 {
+           color: rgb(85, 51, 51);
+           font-family: 'Anton', sans-serif;
+           text-underline-position: below;
+
+        }
     </style>
-        <!-- 
+    <!-- 
         <script type="text/javascript" src="assets/javascript/app.js"></script> -->
 
     <!-- 
@@ -63,143 +93,208 @@
 
     <script>
 
-        
+
 
 
         $(document).ready(function () {
 
 
 
-// Click Start Button
+            // Click Start Button
 
             $("#startBtn").click(function () {
                 $('#stage').removeClass('hidden');
+                $('#submit').removeClass('hidden');
                 $(this).hide();
+
+                countDown();
+            });
+
+
+            // Click Done Button
+
+            $("#submit").click(function () {
+                gameEnd();
+
+            });
+
+            function gameEnd() {
+                $('#stage').hide();
+                $('#startBtn').hide();
+                $('#results').removeClass('hidden');
                
-                run();
-            });
+      
 
-
-// Click Done Button
-
-            $("#doneBtn").click(function () {
-               gameEnd();
-                
-            });
-
-function gameEnd(){
-         $('#stage').hide();
-         $('#startBtn').hide();
-         $('#results').removeClass('hidden');
             };
 
 
 
-// 1000 sec timer
-
-var number = 1000;
-var intervalId;
-
-function run() {
-      clearInterval(intervalId);
-      intervalId = setInterval(decrement, 1000);
-      console.log(intervalId)
-    }
-
-
-function decrement() {
-
-//  Decrease number by one.
-number--;
-
-//  Show the number in the #show-number tag.
-$("#timeRemaining").html("Time Remaining:" + " " + number +  " " + "Seconds");
-
-//  Once number hits zero...
-if (number === 0) {
-    stop();
  
-}
-}
-
-function stop() {
-clearInterval(intervalId);
-console.log(intervalId)
-gameEnd();
-}
 
 
 
-var correctAnswers = "";
-var incorrectAnswers = "";
-var unanswered = "";
+            //  Trivia Questions...
+
+
+            var myQuestions = [
+                {
+                    question: "What does an average human brain weight?",
+                    answers: {
+                        a: '14 grams',
+                        b: '1.4 kilograms',
+                        c: '14 kilograms'
+                    },
+                    correctAnswer: 'b'
+                },
+                {
+                    question: "Neurons are the brain cells that do all the work to keep you moving andthinking. How many neurons are there in your brain?",
+                    answers: {
+                        a: '100',
+                        b: '100 million',
+                        c: '100 billion'
+                    },
+                    correctAnswer: 'b'
+                },
+                {
+                    question: "As your brain developed during early pregnancy, how fast did your neurons multiply?",
+                    answers: {
+                        a: '1250,000 per minute',
+                        b: '250,000 per hour',
+                        c: '250,000 per day'
+                    },
+                    correctAnswer: 'a'
+                }
+
+
+            ];
+
+            var quizContainer = document.getElementById('quiz');
+            var resultsContainer = document.getElementById('results');
+            var submitButton = document.getElementById('submit');
+
+            generateQuiz(myQuestions, quizContainer, resultsContainer, submitButton);
+
+            function generateQuiz(questions, quizContainer, resultsContainer, submitButton) {
+
+                function showQuestions(questions, quizContainer) {
+                    // we'll need a place to store the output and the answer choices
+                    var output = [];
+                    var answers;
+
+                    // for each question...
+                    for (var i = 0; i < questions.length; i++) {
+
+                        // first reset the list of answers
+                        answers = [];
+
+                        // for each available answer...
+                        for (letter in questions[i].answers) {
+
+                            // ...add an html radio button
+                            answers.push(
+                                '<label>'
+                                + '<input type="radio" name="question' + i + '" value="' + letter + '">'
+                                + letter + ': '
+                                + questions[i].answers[letter]
+                                + '</label>'
+                            );
+                        }
+
+                        // add this question and its answers to the output
+                        output.push(
+                            '<div class="question">' + questions[i].question + '</div>'
+                            + '<div class="answers">' + answers.join('') + '</div>'
+                        );
+                    }
+
+                    // finally combine our output list into one string of html and put it on the page
+                    quizContainer.innerHTML = output.join('');
+                }
+
+
+                function showResults(questions, quizContainer, resultsContainer) {
+
+                    // gather answer containers from our quiz
+                    var answerContainers = quizContainer.querySelectorAll('.answers');
+
+                    // keep track of user's answers
+                    var userAnswer = '';
+                    var numCorrect = 0;
+                    var numWrong = 0;
+                    var unAnswered = 0;
+
+                    // for each question...
+                    for (var i = 0; i < questions.length; i++) {
+
+                        // find selected answer
+                        userAnswer = (answerContainers[i].querySelector('input[name=question' + i + ']:checked') || {}).value;
+
+                        // if answer is correct
+                        if (userAnswer === questions[i].correctAnswer) {
+                            // add to the number of correct answers
+                            numCorrect++;
+
+                        }
+
+                        else if (userAnswer === questions[-i]) {
+
+                            unAnswered++;
+
+                        }
+                        // if answer is wrong or blank
+                        else {
+
+                            numWrong++;
+                        }
+                    }
+
+                    // show number of correct answers out of total
+                    resultsContainer.innerHTML = '<h3>ALL DONE</h3> ' +
+                        'Correct Number: ' + numCorrect + '<br/>' + ' Wrong Number: ' + numWrong +
+                        '<br/>' + ' Unanswered: ' + unAnswered;
+
+                }
+
+                // show questions right away
+                showQuestions(questions, quizContainer);
+
+                // on submit, show results
+                submitButton.onclick = function () {
+                    showResults(questions, quizContainer, resultsContainer);
+
+
+                    
+                }
+
+            }
+
+           // 1000 sec timer
+
+
+ var n = 3;
+
+function countDown() {
+
+    n--;
+    if (n > 0) {
+        setTimeout(countDown, 1000);
+        $("#timeRemaining").html("Time Remaining:" + " " + n + " " + "Seconds");
+    } else {
+
+        // WHEN TIMER REACHES 0 STORE DATA: PUSH ANSWERS TO ARRAY, COMPARE ANSWERS TO CORRECT ANSWER 
 
 
 
-//  Trivia Questions...
+        gameEnd();
 
-var allQuestions = [{
-question: "What does an average human brain weight?",
-choices: ["14 grams", "1.4 kilograms", " 14 kilograms" ],
-
-validAnswer: 1
-}, {
-question:"Neurons are the brain cells that do all the work to keep you moving and thinking. How many neurons are there in your brain?",
-choices: ["100", "100 million", "100 billion"],
-validAnswer: 1
-
-}, {
-question:"As your brain developed during early pregnancy, how fast did your neurons multiply?",
-choices: ["250,000 per minute", " 250,000 per hour", "250,000 per day"],
-validAnswer: 0
-
-}, {
-question:"Which side of your brain has more neurons?",
-choices: ["Left", "Right", "Both the same"],
-validAnswer: 0
-
-}, {
-question:"A synapse is a connection between two neurons through which they communicate. How many synapses does a typical neuron have?",
-        
-
-choices: ["10 to 20", "100 to 500", "1000 to 10000"],
-validAnswer: 2
-
- }, 
-];
+        // WHEN TIMER REACHES 0 STORE DATA: PUSH ANSWERS TO ARRAY, COMPARE ANSWERS TO CORRECT ANSWER 
 
 
-function setupOptions() {
-  $('#question').html(parseInt(currentquestion) + 1 + ". " + allQuestions[currentquestion].question);
-  var options = allQuestions[currentquestion].choices;
-  var formHtml = '';
-  for (var i = 0; i < options.length; i++) {
-    formHtml += '<div><input type="radio" name="option" value="' + i + '" id="option' + i + '"><label for="option' + i + '">' +
-      allQuestions[currentquestion].choices[i] + '</label></div><br/>';
-  }
-  $('#form').html(formHtml);
-  $("#option0").prop('checked', true);
+// DISPLAY: REMOVE TRIVIA, SHOW SCORE
+
+
+    }
 };
-
-function checkAns() {
-  if ($("input[name=option]:checked").val() == allQuestions[currentquestion].correctAnswer) {
-    correctAnswers++;
-  };
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -210,6 +305,9 @@ function checkAns() {
 
 
     </script>
+
+
+
 
 
 
@@ -265,136 +363,18 @@ function checkAns() {
 
 
                 <!-- Trivia Question Starts -->
-                <div class="container">
 
+
+                <div class="container">
                     <!-- Q1-->
                     <div class="container">
-                        <div class="  text-center col-xs-12 col-md-12 alert alert-primary">
+                        <div class="  text-center col-xs-12 col-md-12 alert ">
 
-                            <h3 class="text-center">What does an average human brain weight?</h3>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                                    14 grams
-                                </label>
 
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
-                                    1.4 kilograms --- answer
-                                </label>
+                            <div id="quiz"></div>
 
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                                <label class="form-check-label" for="exampleRadios3">
-                                    14 kilograms
-                                </label>
-                            </div>
 
-                        </div>
-                    </div>
-                    <!-- Q2-->
 
-                    <div class="container">
-                        <div class=" text-center col-xs-12 col-md-12 alert alert-primary">
-
-                            <h3 class="text-center">Neurons are the brain cells that do all the work to keep you moving and
-                                thinking. How many neurons are there in your brain?</h3>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                                    100
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
-                                    100 million -- answer
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                                <label class="form-check-label" for="exampleRadios3">
-                                    100 billion
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Q3-->
-
-                    <div class="container">
-                        <div class=" text-center col-xs-12 col-md-12 alert alert-primary">
-
-                            <h3 class="text-center">As your brain developed during early pregnancy, how fast did your neurons
-                                multiply?
-                            </h3>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                                    250,000 per minute --- answer
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
-                                    250,000 per hour
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                                <label class="form-check-label" for="exampleRadios3">
-                                    250,000 per day -- answer
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Q4-->
-
-                    <div class="container">
-                        <div class=" text-center col-xs-12 col-md-12 alert alert-primary">
-
-                            <h3 class="text-center">Which side of your brain has more neurons?</h3>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                                    Left --- answer
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
-                                    Right
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                                <label class="form-check-label" for="exampleRadios3">
-                                    Both the same
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Q5-->
-
-                    <div class="container">
-                        <div class="text-center col-xs-12 col-md-12 alert alert-primary">
-
-                            <h3 class="text-center">A synapse is a connection between two neurons through which they communicate.
-                                How many synapses does a typical neuron have?</h3>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                                <label class="form-check-label" for="exampleRadios1">
-                                    10 to 20
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                                <label class="form-check-label" for="exampleRadios2">
-                                    100 to 500
-                                </label>
-
-                                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                                <label class="form-check-label" for="exampleRadios3">
-                                    1000 to 10000 --- answer
-                                </label>
-                            </div>
 
                         </div>
                     </div>
@@ -406,7 +386,8 @@ function checkAns() {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-12 col-sm-12 col-xs-12 text-center ">
-                            <button id="doneBtn" type="button" class="btn btn-lg btn-warning" style="padding:20px 50px;">DONE</button>
+                            <!-- <button id="sumbit" type="button" class="btn btn-lg btn-warning hidden" style="padding:20px 50px;">DONE</button>  -->
+                            <div id="submit" class="btn btn-lg btn-warning hidden" style="padding:20px 50px;">FINISHED TRIVIA</div>
                         </div>
 
                     </div>
@@ -420,24 +401,19 @@ function checkAns() {
 
 
             <!-- Results -->
-            <div class="hidden" id="results">
-                <div class="container">
-                    <div class="row">
-                        <div class=" text-center col-md-12 col-sm-12 col-xs-12  alert-warning">
-                            <h3>ALL DONE</h3>
-                            <h5 id="correctAnswers">Correct Answers:</h5>
-                            <h5 id="incorrectAnswers">Correct Answers:</h5>
-                            <h5 id="unanswered">Unanswered:</h5>
-                        </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="hidden text-center col-md-12 col-sm-12 col-xs-12  alert-warning" id="results">
+
                     </div>
                 </div>
-            </div>
-            <!-- results-->
+                <!-- results-->
 
 
 
-        </div> <!-- jumble ton end -->
-    </div>
+            </div> <!-- jumble ton end -->
+        </div>
 
 
 
