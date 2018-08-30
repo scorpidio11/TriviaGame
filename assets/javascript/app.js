@@ -4,7 +4,7 @@
 
  $(document).ready(function () {
 
-        var n = 50;
+        var n = 10;
 
         var win = 0;
         var loss = 0;
