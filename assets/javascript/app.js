@@ -1,219 +1,169 @@
 
 
-$(document).ready(function () {
-
-    var targetNumber = Math.floor(Math.random() * 120 + 19); // random traget number 19-120
-    var bt1 = Math.floor(Math.random() * 12 + 1);
-    var bt2 = Math.floor(Math.random() * 12 + 1);
-    var bt3 = Math.floor(Math.random() * 12 + 1);
-    var bt4 = Math.floor(Math.random() * 12 + 1);
 
 
-    // var crystalRandom = Math.floor(Math.random()*12+1);
+ $(document).ready(function () {
 
-    var total = 0;
-    var win = 0;
-    var lose = 0;
-    var message = "";
+        var n = 50;
 
+        var win = 0;
+        var loss = 0;
+        var unanswered = 0;
 
-
-    // 1. random number 19-120 show on the page on load & Apped random numbers to Crystal
-
-    $("#targetNum").text(targetNumber);
-
-
-    // <button1>
-
-    //Event delegation    $(document).on("click", "#button1", function () 
-
-    $("#button1").on("click", function () {
+        var userAnswer1;
+        var userAnswer2;
+        var userAnswer3;
+        var userAnswers = [];
+        var correctAnswerArray = ["1.4 kilograms", "Left", "1000 to 10000"];
+        var endTime;
 
 
-        $("#button1").append(bt1);
-        console.log(bt1);
+        // START BUTTON FUNCTION STARTS TIMER
+        startBtnTimer();
 
-        total += bt1;
-        $("#totalNum").text(total);
+        function startBtnTimer() {
+            $('#startBtn').on('click', function (startTimerGoing) {
 
-        if (total === targetNumber) {
-            $("#message").text("YOU WON");
-            $("#win").text(++win);
+                // MAKE SCREEN DISAPPEAR
+                $('#startBtn').css({
+                    'display': 'none'
+                });
+                $('#triviaScreen').css({
+                    'display': 'block'
+                });
+                $('#timerScreen').css({
+                    'display': 'block'
+                });
+
+                $('#submit').css({
+                    'display': 'block'
+                });
+
+                // START GAME FUNCTION
+                countDown();
+            });
+        }
+
+        // TIMER FUNCTION
 
 
-            // re assigning button do not use var  #
-                $("#button1").empty();
-            bt1 = Math.floor(Math.random() * 12 + 1);
-            $("#button1").append(bt1);
+
+        function countDown() {
 
 
-            reset();
-            console.log(bt2);
+            n--;
+            if (n > 0) {
+                endTime = setTimeout(countDown, 1000);
+                $("#timerScreen").html('<h2> Time Left: ' + n + ' Seconds!</h2>');
+            } else {
+
+                // WHEN TIMER REACHES 0 STORE DATA: PUSH ANSWERS TO ARRAY, COMPARE ANSWERS TO CORRECT ANSWER 
+
+                createArrayOfUserAnswers();
+                compareArray();
+                showScoreboard();
+
+
+                // DISPLAY: REMOVE TRIVIA, SHOW SCORE
+
+
+                $('#timerScreen').css({
+                    'display': 'none'
+                });
+
+
+                $('#triviaScreen').css({
+                    'display': 'none'
+                });
+
+            }
+
+        };
+
+        // GET VALUE OF ANSWER CLICKED
+
+        $('.radioSelect1').on('click', function (storeTriviaBtnAnswer) {
+            userAnswer1 = $('input[name="question1"]:checked').val();
+        });
+
+        $('.radioSelect2').on('click', function (storeTriviaBtnAnswer) {
+            userAnswer2 = $('input[name="question2"]:checked').val();
+        });
+
+        $('.radioSelect3').on('click', function (storeTriviaBtnAnswer) {
+            userAnswer3 = $('input[name="question3"]:checked').val();
+        });
+
+        // CREATE ANSWER ARRAY OF USER ANSWERS
+
+        function createArrayOfUserAnswers() {
+            userAnswers.push(userAnswer1);
+            userAnswers.push(userAnswer2);
+            userAnswers.push(userAnswer3);
+            console.log(userAnswers);
+        }
+
+        // COMPARE TO ARRAY OF CORRECT ANSWERS AND ADD TO VALUE OF WIN / LOSS / UNANSWERED
+
+        function compareArray() {
+
+            //var userAnswersLength = userAnswers.length;
+
+            for (var i = 0; i < userAnswers.length; i++) {
+                if (correctAnswerArray[i] === userAnswers[i]) {
+                    win++;
+                } else if (userAnswers[i] === undefined) {
+                    unanswered++;
+                } else {
+                    loss++;
+                }
+            }
+        }
+
+        // SHOW POINTS IN SCOREBOARD
+
+        function showScoreboard() {
+
+            $("#scoreBoard").html('<h2>All Done!</h2><h3>Wins: ' + win + '</h3> <h3>Losses: ' + loss + '</h3>' + '<h3>Unanswered: ' + unanswered + '</h3>');
+            $('#scoreBoard').css({
+                'display': 'block'
+            });
+            $('#submit').css({
+                'display': 'none'
+            });
+
 
         }
 
-        else if (total > targetNumber) {
-            $("#message").text("YOU LOST");
-            $("#lose").text(++lose);
+
+        //  FINISH TRIVIA BUTTON (SUBMIT BUTTON)
+
+        $('#submit').on('click', function () {
+
+            $('#triviaScreen').css({
+                'display': 'none'
+            });
+            $('#timerScreen').css({
+                'display': 'none'
+            });
+
+            $('#submit').css({
+                'display': 'none'
+            });
+
+
+            createArrayOfUserAnswers();
+            compareArray();
+            showScoreboard();
+            clearTimeout(endTime);
+
+
+        })
 
 
 
-               // re assigning button #
-            $("#button1").empty();
-            bt1 = Math.floor(Math.random() * 12 + 1);
-            $("#button1").append(bt1);
-            reset();
-        }
-    });
-
-
-
-    // <button2>
-
-    $("#button2").on("click", function () {
-
-
-        $("#button2").append(bt2);
-        console.log(bt2);
-
-        total += bt2;
-        $("#totalNum").text(total);
-
-
-
-        if (total === targetNumber) {
-            $("#message").text("YOU WON");
-            $("#win").text(++win);
-
-
-
-// re assigning button #
-            $("#button2").empty();
-            bt2 = Math.floor(Math.random() * 12 + 1);
-            $("#button2").append(bt2);
-            reset();
-        }
-
-        else if (total > targetNumber) {
-            $("#message").text("YOU LOST");
-            $("#lose").text(++lose);
-
-
-// re assigning button #
-
-            $("#button2").empty();
-            bt2 = Math.floor(Math.random() * 12 + 1);
-            $("#button2").append(bt2);
-            reset();
-        }
-
-    });
-
-
-    // <button3>
-
-    $("#button3").on("click", function () {
-
-
-        $("#button3").append(bt3);
-        console.log(bt3);
-
-        total += bt3;
-        $("#totalNum").text(total);
-
-
-        if (total === targetNumber) {
-            $("#message").text("YOU WON");
-            $("#win").text(++win);
-
-
-            reset();
-
-            $("#button3").empty();
-            bt3 = Math.floor(Math.random() * 12 + 1);
-            $("#button3").append(bt3);
-
-        }
-
-        else if (total > targetNumber) {
-            $("#message").text("YOU LOST");
-            $("#lose").text(++lose);
-
-
-            reset();
-            $("#button3").empty();
-            bt3 = Math.floor(Math.random() * 12 + 1);
-            $("#button3").append(bt3);
-        }
-
-    });
-
-    // <button4>
-
-
-    $("#button4").on("click", function () {
-
-
-        $("#button4").append(bt4);
-        console.log(bt4);
-
-        total += bt4;
-        $("#totalNum").text(total);
-
-
-
-        if (total === targetNumber) {
-            $("#message").text("YOU WON");
-            $("#win").text(++win);
-
-            reset();
-            $("#button4").empty();
-            bt4 = Math.floor(Math.random() * 12 + 1);
-            $("#button4").append(bt4);
-        }
-
-        else if (total > targetNumber) {
-            $("#message").text("YOU LOST");
-            $("#lose").text(++lose);
-
-
-            reset();
-            $("#button4").empty();
-            bt4 = Math.floor(Math.random() * 12 + 1);
-            $("#button4").append(bt4);
-        }
 
     });
-
-
-
-    function reset() {
-
-        $("#totalNum").empty();
-        total = 0;
-        $("#totalNum").text(total);
-
-        console.log(total);
-
-        $("#targetNum").empty();
-        targetNumber = Math.floor(Math.random() * 120 + 19);
-
-
-        $("#targetNum").text(targetNumber);
-        console.log(targetNumber);
-
-    }
-
-
-});
-
-
-
-
-
-
-
-
 
 
 

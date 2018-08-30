@@ -1,0 +1,54 @@
+h1 {
+    font-family: 'Anton', sans-serif;
+    font-size: 5rem
+}
+
+body {
+    background-image: url("../images/bg.jpg");
+    font-family:  Arial, Helvetica, sans-serif;
+}
+
+
+.jumbotron {
+    background: white;
+    margin-top: 20px;
+    
+}
+
+.btn-block {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+#triviaScreen, #timerScreen, #submit, #scoreBoard {
+    display: none;
+    
+}
+#timerScreen{
+color:rgb(238, 162, 54);
+}
+
+#startBtn {
+    padding: 20px 90px;
+    margin: 200px 0 30px 0;
+    font-size: 2rem;
+    
+}
+
+#submit {
+    padding: 20px 90px;
+    margin: 50px 0 0 0;
+    font-size: 2rem;
+      margin-left: auto;
+    margin-right: auto;
+    
+
+}
+
+.container {
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+  
+}
+

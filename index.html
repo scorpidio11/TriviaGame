@@ -10,49 +10,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
 
+
+    <script type="text/javascript" src="assets/javascript/app.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
     <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
-
-    <style>
-        h1 {
-            font-family: 'Anton', sans-serif;
-        }
-
-        body {
-            background-image: url("assets/images/bg.jpg");
-        }
-
-        .question {
-            font-family: 'Anton', sans-serif;
-            margin-top: 20px;
-            font-size: 20px;
-        }
-
-        .answers {
-            font-size: 15px;
-            margin-bottom: 20px;
-            padding: 10px;
-            color: grey;
-        }
-
-        input[type="radio"] {
-            margin-right: 5px;
-            margin-left: 15px;
-        }
-
-        #results {
-            padding-bottom: 30px;
-            font-size: 20px;
-
-        }
-        #results > h3 {
-           color: rgb(85, 51, 51);
-           font-family: 'Anton', sans-serif;
-           text-underline-position: below;
-
-        }
-    </style>
-    <!-- 
-        <script type="text/javascript" src="assets/javascript/app.js"></script> -->
 
     <!-- 
         JavaScript for the logic and jQuery to manipulate HTML. Be sure to layout this app with valid HTML and stylish CSS.
@@ -61,362 +22,130 @@
 
         Psudo Code
 
-        Start button (show start hide when game start)
+        Start button 
+        (Timer/ Trivia / Submit buttons div are hidden)
 
         When the game starts
 
         Timer starts
-        10 Trivia Game with one answer
-        if right answer : correctAnswer++
-        if else Incorrect: incorrectAnswer++
-        else : 
-        
+        3 Trivia Game with one answer
+    
+        Pull values from page form (HTML)
+        Push value to userAnswer Arry
+        compare uswerAnswer array with correctAnswer array
+        and get score
 
-        Game ends when timer = 0
+        if right answer : win++
+        if else Incorrect: loss++
+        else : Unanswered : unanswered++
 
-        When the game ends, show this div (done)
-        All Done!
+        Didplay scores on scoreboard
+
+
+        Timer Ends == Game End
+        Show Scoreboard 
+        " All Done!
         Correct Answers:
         Incorrect Answers:
-        Unanswered:
+        Unanswered:"
+        Hide questions, timers, submit button
 
- 
- 
- Game ends by
- Timer is up
- Push Done button
 
+        Submit Button == Game End
+        collect answers & html on score board
+        Stop Timer
 
      -->
-
-
-
-    <script>
-
-
-
-
-        $(document).ready(function () {
-
-
-
-            // Click Start Button
-
-            $("#startBtn").click(function () {
-                $('#stage').removeClass('hidden');
-                $('#submit').removeClass('hidden');
-                $(this).hide();
-
-                countDown();
-            });
-
-
-            // Click Done Button
-
-            $("#submit").click(function () {
-                gameEnd();
-
-            });
-
-            function gameEnd() {
-                $('#stage').hide();
-                $('#startBtn').hide();
-                $('#results').removeClass('hidden');
-               
-      
-
-            };
-
-
-
- 
-
-
-
-            //  Trivia Questions...
-
-
-            var myQuestions = [
-                {
-                    question: "What does an average human brain weight?",
-                    answers: {
-                        a: '14 grams',
-                        b: '1.4 kilograms',
-                        c: '14 kilograms'
-                    },
-                    correctAnswer: 'b'
-                },
-                {
-                    question: "Neurons are the brain cells that do all the work to keep you moving andthinking. How many neurons are there in your brain?",
-                    answers: {
-                        a: '100',
-                        b: '100 million',
-                        c: '100 billion'
-                    },
-                    correctAnswer: 'b'
-                },
-                {
-                    question: "As your brain developed during early pregnancy, how fast did your neurons multiply?",
-                    answers: {
-                        a: '1250,000 per minute',
-                        b: '250,000 per hour',
-                        c: '250,000 per day'
-                    },
-                    correctAnswer: 'a'
-                }
-
-
-            ];
-
-            var quizContainer = document.getElementById('quiz');
-            var resultsContainer = document.getElementById('results');
-            var submitButton = document.getElementById('submit');
-
-            generateQuiz(myQuestions, quizContainer, resultsContainer, submitButton);
-
-            function generateQuiz(questions, quizContainer, resultsContainer, submitButton) {
-
-                function showQuestions(questions, quizContainer) {
-                    // we'll need a place to store the output and the answer choices
-                    var output = [];
-                    var answers;
-
-                    // for each question...
-                    for (var i = 0; i < questions.length; i++) {
-
-                        // first reset the list of answers
-                        answers = [];
-
-                        // for each available answer...
-                        for (letter in questions[i].answers) {
-
-                            // ...add an html radio button
-                            answers.push(
-                                '<label>'
-                                + '<input type="radio" name="question' + i + '" value="' + letter + '">'
-                                + letter + ': '
-                                + questions[i].answers[letter]
-                                + '</label>'
-                            );
-                        }
-
-                        // add this question and its answers to the output
-                        output.push(
-                            '<div class="question">' + questions[i].question + '</div>'
-                            + '<div class="answers">' + answers.join('') + '</div>'
-                        );
-                    }
-
-                    // finally combine our output list into one string of html and put it on the page
-                    quizContainer.innerHTML = output.join('');
-                }
-
-
-                function showResults(questions, quizContainer, resultsContainer) {
-
-                    // gather answer containers from our quiz
-                    var answerContainers = quizContainer.querySelectorAll('.answers');
-
-                    // keep track of user's answers
-                    var userAnswer = '';
-                    var numCorrect = 0;
-                    var numWrong = 0;
-                    var unAnswered = 0;
-
-                    // for each question...
-                    for (var i = 0; i < questions.length; i++) {
-
-                        // find selected answer
-                        userAnswer = (answerContainers[i].querySelector('input[name=question' + i + ']:checked') || {}).value;
-
-                        // if answer is correct
-                        if (userAnswer === questions[i].correctAnswer) {
-                            // add to the number of correct answers
-                            numCorrect++;
-
-                        }
-
-                        else if (userAnswer === questions[-i]) {
-
-                            unAnswered++;
-
-                        }
-                        // if answer is wrong or blank
-                        else {
-
-                            numWrong++;
-                        }
-                    }
-
-                    // show number of correct answers out of total
-                    resultsContainer.innerHTML = '<h3>ALL DONE</h3> ' +
-                        'Correct Number: ' + numCorrect + '<br/>' + ' Wrong Number: ' + numWrong +
-                        '<br/>' + ' Unanswered: ' + unAnswered;
-
-                }
-
-                // show questions right away
-                showQuestions(questions, quizContainer);
-
-                // on submit, show results
-                submitButton.onclick = function () {
-                    showResults(questions, quizContainer, resultsContainer);
-
-
-                    
-                }
-
-            }
-
-           // 1000 sec timer
-
-
- var n = 3;
-
-function countDown() {
-
-    n--;
-    if (n > 0) {
-        setTimeout(countDown, 1000);
-        $("#timeRemaining").html("Time Remaining:" + " " + n + " " + "Seconds");
-    } else {
-
-        // WHEN TIMER REACHES 0 STORE DATA: PUSH ANSWERS TO ARRAY, COMPARE ANSWERS TO CORRECT ANSWER 
-
-
-
-        gameEnd();
-
-        // WHEN TIMER REACHES 0 STORE DATA: PUSH ANSWERS TO ARRAY, COMPARE ANSWERS TO CORRECT ANSWER 
-
-
-// DISPLAY: REMOVE TRIVIA, SHOW SCORE
-
-
-    }
-};
-
-
-
-
-
-        });
-
-
-
-    </script>
-
-
-
-
-
-
-
 
 </head>
 
 <body>
-    <!-- Jumbotron for Title & Instruction Win and Lose-->
     <title>Trivia Game</title>
 
-    <div class="container">
-        <div class="jumbotron" style="background:white; margin-top:20px;">
+    <div class="container ">
+
+        <div class="jumbotron text-center ">
+
+            <h1>Brain Buster Trivia</h1>
+
+            <button id="startBtn" type="button" class="btn btn-warning">
+                START GAME
+            </button>
+
+           <!-- Timer Starts -->
+
+            <div class="row" id="timerScreen"></div>
+
+            <!-- Timer Ends -->
 
 
-            <!-- title -->
-            <div class="container ">
-
-                <div class="row">
-
-                    <div class="col-md-12 col-sm-12 col-xs-12">
-
-                        <h1 class="text-center">Brain Buster Trivia</h1>
-
-                    </div>
-                </div>
-            </div>
+            <!-- Trivia Question Starts -->
 
 
-            <div class="container">
-                <div class="row pt-3 pb-3   ">
-                    <div class="col-md-12 col-sm-12 col-xs-12 text-center ">
-                        <button id="startBtn" type="button" class="btn btn-primary btn-lg btn-warning" style="padding:20px 50px; margin:100px 0;">START
-                            GAME
-                        </button>
-                    </div>
+            <div class="container" id="triviaScreen">
+                <!-- Q1-->
+                <div class="question1">
+                    <h3>What does an average human brain weight?</h3>
 
-                </div>
-            </div>
-
-
-
-
-            <div id="stage" class="container hidden">
-                <!-- Timer Starts -->
-
-                <div class="container" style="padding-top: -150px">
-                    <div class=" text-center col-md-12 col-sm-12 col-xs-12  alert-warning">
-                        <h3 id="timeRemaining"> </h3>
-                    </div>
-                </div>
-                <!-- Timer Ends -->
-
-
-                <!-- Trivia Question Starts -->
-
-
-                <div class="container">
-                    <!-- Q1-->
-                    <div class="container">
-                        <div class="  text-center col-xs-12 col-md-12 alert ">
-
-
-                            <div id="quiz"></div>
-
-
-
-
+                    <form class="question1Form">
+                        <div class="radio">
+                            <label><input class="radioSelect1" type="radio" name="question1" value="14 grams">14 grams
+                            </label>
                         </div>
-                    </div>
-                    <!-- Trivia Question ends -->
-                </div>
-                <!-- Wrap Trivia -->
-
-                <!-- Done Button -->
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-12 text-center ">
-                            <!-- <button id="sumbit" type="button" class="btn btn-lg btn-warning hidden" style="padding:20px 50px;">DONE</button>  -->
-                            <div id="submit" class="btn btn-lg btn-warning hidden" style="padding:20px 50px;">FINISHED TRIVIA</div>
+                        <div class="radio">
+                            <label><input class="radioSelect1" type="radio" name="question1" value="1.4 kilograms">1.4 kilograms
+                            </label>
                         </div>
+                        <div class="radio">
+                            <label><input class="radioSelect1" type="radio" name="question1" value="14 kilograms">14 kilograms
+                            </label>
+                        </div>
+                    </form>
+                </div> <!-- end question1 div -->
 
-                    </div>
-                </div>
-                <!-- Done Button -->
+                <div class="question2">
+                    <h3>Which side of your brain has more neurons?</h3>
 
+                    <form class="question2Form">
+                        <div class="radio">
+                            <label><input class="radioSelect2" type="radio" name="question2" value="Left">Left</label>
+                        </div>
+                        <div class="radio">
+                            <label><input class="radioSelect2" type="radio" name="question2" value="Right">Right</label>
+                        </div>
+                        <div class="radio">
+                            <label><input class="radioSelect2" type="radio" name="question2" value="Both the same">Both the
+                                same
+                            </label>
+                        </div>
+                    </form>
+                </div> <!-- end question1 div -->
 
+                <div class="question3">
+                    <h3>A synapse is a connection between two neurons through which they communicate. How many synapses does
+                        a typical neuron have?</h3>
+
+                    <form class="question3Form">
+                        <div class="radio">
+                            <label><input class="radioSelect3" type="radio" name="question3" value="10 to 20">10 to 20</label>
+                        </div>
+                        <div class="radio">
+                            <label><input class="radioSelect3" type="radio" name="question3" value="100 to 500">100 to 500
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label><input class="radioSelect3" type="radio" name="question3" value="1000 to 10000">1000 to
+                                10000
+                            </label>
+                        </div>
+                    </form>
+                </div> <!-- end question1 div -->
             </div>
+            <button id="submit" class="btn btn-warning  ">FINISHED TRIVIA</button>
+            <div id="scoreBoard"></div>
 
-
-
-
-            <!-- Results -->
-
-            <div class="container">
-                <div class="row">
-                    <div class="hidden text-center col-md-12 col-sm-12 col-xs-12  alert-warning" id="results">
-
-                    </div>
-                </div>
-                <!-- results-->
-
-
-
-            </div> <!-- jumble ton end -->
-        </div>
-
-
-
+        </div> <!-- jumbotronend -->
+    </div>
 
 </body>
 
